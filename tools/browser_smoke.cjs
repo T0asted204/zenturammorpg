@@ -17,6 +17,8 @@ const assert = require('node:assert/strict');
    page.on('websocket',ws=>ws.on('framereceived',()=>frames++));
    await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8060');
    await page.waitForTimeout(10000);
+   // Wait for an actual composed canvas frame before sending native input.
+   await page.screenshot();
    const name='web_'+String(Date.now()).slice(-8)+'_'+i; names.push(name);
    await page.mouse.click(500,332); await page.keyboard.press('Control+a'); await page.keyboard.type(name);
    await page.mouse.click(500,373); await page.keyboard.type('browser-test-pass');

@@ -10,5 +10,6 @@ Completed locally:
 - Two isolated Chrome browser contexts loaded the actual exported WASM client over HTTP, joined the same WebSocket server using distinct accounts, received live snapshots, and exercised keyboard movement. The test checked both saved accounts and changed authoritative position, with no browser console/page errors. `BROWSER_SMOKE_PASS` reported 822 received frames in the first run.
 - Browser screenshot visually inspected: world, two players, HUD, inventory and recipe controls render correctly. `docs/browser-gameplay.png` is from that shared browser session.
 - Git whitespace check passed.
+- GitHub Actions run [43618532831](https://github.com/T0asted204/zenturammorpg/actions/runs/43618532831) independently passed the rules tests, browser export and artifact upload for the initial implementation.
 
 The rules test simulates transactions and combat directly; those checks are not a claim of a complete human multiplayer combat playtest. Secure reverse-proxy Internet hosting, mobile/Safari/Firefox behavior, reconnect under packet loss, sudden power loss, large-population performance and anti-abuse hardening have not been verified. CI is configured to repeat the rules tests and export on GitHub; local results above do not imply a hosted CI result.
