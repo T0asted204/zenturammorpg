@@ -1,0 +1,10 @@
+# Replace example.com; run Caddy with access to build/web.
+example.com {
+ handle /world {
+  reverse_proxy 127.0.0.1:9080
+ }
+ handle {
+  root * /srv/zentura/build/web
+  file_server
+ }
+}
