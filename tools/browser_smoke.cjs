@@ -10,7 +10,7 @@ const assert = require('node:assert/strict');
  try {
   const errors=[]; const pages=[]; const names=[]; let frames=0;
   for(let i=0;i<2;i++) {
-   const context=await browser.newContext({viewport:{width:1280,height:800}});
+   const context=await browser.newContext({viewport:{width:1280,height:800},deviceScaleFactor:0.5});
    const page=await context.newPage(); pages.push(page);
    page.on('pageerror',e=>errors.push(e.message));
    page.on('console',m=>{if(m.type()==='error') errors.push(m.text());});
@@ -18,11 +18,12 @@ const assert = require('node:assert/strict');
    await page.goto(process.env.GAME_URL || 'http://127.0.0.1:8060');
    await page.waitForTimeout(10000);
    // Wait for an actual composed canvas frame before sending native input.
-   await page.screenshot();
-   const name='web_'+String(Date.now()).slice(-8)+'_'+i; names.push(name);
-   await page.mouse.click(500,332); await page.keyboard.press('Control+a'); await page.keyboard.type(name);
-   await page.mouse.click(500,373); await page.keyboard.type('browser-test-pass');
+   await page.screenshot({timeout:120000});
+   const name='web'+String(Date.now()).slice(-8)+i; names.push(name);
+   await page.mouse.click(500,332); await page.waitForTimeout(500); await page.keyboard.press('Control+a'); await page.keyboard.type(name,{delay:200});
+   await page.mouse.click(500,373); await page.waitForTimeout(500); await page.keyboard.type('browser-test-pass',{delay:200}); await page.waitForTimeout(500);
    await page.mouse.click(600,453); await page.waitForTimeout(2000);
+   await page.screenshot({path:require('node:path').join(__dirname,`../build/browser-client-${i}.png`)});
   }
   assert(frames>10,'Both browser clients should receive live WebSocket snapshots');
   await pages[0].mouse.click(700,560); // focus world, then exercise movement
@@ -32,7 +33,7 @@ const assert = require('node:assert/strict');
   if(process.env.TEST_SAVE_FILE) {
    const data=JSON.parse(fs.readFileSync(process.env.TEST_SAVE_FILE,'utf8'));
    for(const name of names) assert(data.accounts[name],`Persisted browser account ${name}`);
-   assert(Math.abs(data.accounts[names[0]].x)>1,'Browser keyboard movement reached authoritative save');
+   assert(Math.abs(data.accounts[names[0]].x)>1,'Browser movement reached authoritative save');
   }
   assert.deepEqual(errors,[],'Browser must have no script/WebGL errors');
   console.log('BROWSER_SMOKE_PASS', {names,frames});
